@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.production
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+dist-ssr/
+.output/
+.nitro/
+.tanstack/
+.wrangler/
+.vinxi/
+out/
+cache/
+
+# Prisma generated
+prisma/generated/
+
+# Foundry
+/contract/cache/
+/contract/out/
+!/contract/broadcast
+/contract/broadcast/*/31337/
+/contract/broadcast/**/dry-run/
+
+# IDE
+.DS_Store
+*.local
+*.swp
+*.swo
+
+# Claude / AI
+.claude/
+CLAUDE.md
+memory/
+.playwright-mcp/
+
+# Project docs (not README)
+BREAKBASE_V2.md
+BREAKBASE_V3.md
+DEMOSCRIPT.md
+ECONOMICS.md
+HACKATHON.md
+IDEA.md
+JAILBREAK.md
+PITCHDECK.md
+STARTUP_TRACK_WINNERS.md
+STRATEGY.md
+VC_INSIGHTS.md
+
+# Images (screenshots)
+*.png
+
+# Misc
+todos.json
+temp/
+count.txt
