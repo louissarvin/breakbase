@@ -1,0 +1,263 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================
+// User
+// ============================
+
+model User {
+  id             String    @id @default(cuid())
+  walletAddress  String    @unique
+  nonce          String?
+  lastSignIn     DateTime?
+
+  totalMessages     Int       @default(0)
+  totalWins         Int       @default(0)
+  totalSpentUsdc    BigInt    @default(0)
+  totalEarningsUsdc BigInt    @default(0)
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  messages       Message[]
+
+  @@index([walletAddress])
+}
+
+// ============================
+// ErrorLog (unchanged)
+// ============================
+
+model ErrorLog {
+  id         String   @id @default(cuid())
+  errorCode  String
+  message    String
+  statusCode Int
+  stack      String?  @db.Text
+  context    String?  @db.Text
+  userId     String?
+  method     String?
+  path       String?
+  userAgent  String?  @db.Text
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([errorCode])
+  @@index([createdAt])
+}
+
+// ============================
+// Challenge
+// ============================
+
+model Challenge {
+  id                String           @id @default(cuid())
+
+  // On-chain identity
+  challengeId       String           @unique
+  cloneAddress      String           @unique
+  factoryAddress    String
+  txHash            String?
+
+  // Configuration (mirrors on-chain)
+  defender          String
+  basePrice         BigInt
+  maxFee            BigInt           @default(0)
+  duration          Int
+  growthRateBps     Int              @default(0)
+  pricingModel      PricingModel     @default(Fixed)
+  endTime           DateTime
+
+  // Off-chain metadata
+  title             String
+  description       String           @db.Text
+  systemPrompt      String           @db.Text
+  aiModel           String           @default("anthropic:claude-sonnet-4-20250514")
+  difficulty        Difficulty       @default(Medium)
+  challengeType     ChallengeType    @default(Custom)
+  tags              String[]         @default([])
+  agentEndpoint     String?
+
+  // Agent persona (optional, for personalized AI identity)
+  agentName        String?
+  agentPersona     String?  @db.Text
+  agentStyle       String?
+  agentGreeting    String?  @db.Text
+
+  // Tracked state (synced from chain)
+  status            ChallengeStatus  @default(Active)
+  prizePool         BigInt           @default(0)
+  messageCount      Int              @default(0)
+  winnerAddress     String?
+  winnerAttempt     Int?
+  resolvedAt        DateTime?
+
+  // Protocol flag
+  isProtocol        Boolean          @default(false)
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  messages          Message[]
+  agentActions      AgentAction[]
+
+  @@index([status])
+  @@index([defender])
+  @@index([endTime])
+  @@index([createdAt])
+  @@index([challengeId])
+}
+
+// ============================
+// Message
+// ============================
+
+model Message {
+  id               String           @id @default(cuid())
+
+  challengeId      String
+  challenge        Challenge        @relation(fields: [challengeId], references: [id])
+
+  playerAddress    String
+  userId           String?
+  user             User?            @relation(fields: [userId], references: [id])
+
+  attemptNumber    Int
+  playerMessage    String           @db.Text
+  aiResponse       String           @db.Text
+
+  evaluation       EvaluationResult @default(Defended)
+  evaluationReason String?          @db.Text
+  attackType       String?
+  owaspCategory    Int?
+  severity         Int?
+
+  feePaid          BigInt           @default(0)
+  txHash           String?
+
+  oracleSignature  String?          @db.Text
+  oracleDeadline   DateTime?
+
+  createdAt        DateTime         @default(now())
+
+  @@index([challengeId])
+  @@index([playerAddress])
+  @@index([attemptNumber])
+  @@index([evaluation])
+}
+
+// ============================
+// AgentAction
+// ============================
+
+model AgentAction {
+  id              String          @id @default(cuid())
+
+  actionType      AgentActionType
+  challengeId     String?
+  challenge       Challenge?      @relation(fields: [challengeId], references: [id])
+
+  description     String          @db.Text
+  txHash          String?
+  status          ActionStatus    @default(Pending)
+  error           String?         @db.Text
+
+  amountUsdc      BigInt?
+
+  createdAt       DateTime        @default(now())
+  completedAt     DateTime?
+
+  @@index([actionType])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================
+// IndexerState
+// ============================
+
+model IndexerState {
+  id              String   @id @default("singleton")
+  lastBlockNumber Int      @default(0)
+  updatedAt       DateTime @updatedAt
+}
+
+// ============================
+// Farcaster Notification Tokens
+// ============================
+
+model FarcasterNotificationToken {
+  id        String   @id @default(cuid())
+  fid       Int
+  token     String
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([fid, url])
+  @@index([fid])
+}
+
+// ============================
+// Enums
+// ============================
+
+enum PricingModel {
+  Fixed
+  Escalating
+}
+
+enum ChallengeStatus {
+  Active
+  Resolved
+  Expired
+  Cancelled
+}
+
+enum Difficulty {
+  Easy
+  Medium
+  Hard
+  Expert
+}
+
+enum EvaluationResult {
+  Defended
+  Broken
+  Error
+}
+
+enum ChallengeType {
+  SecretExtraction
+  PersonaBreak
+  SystemPromptLeak
+  FunctionAbuse
+  LogicManipulation
+  ContextPoisoning
+  MultiTurnErosion
+  AgentEscape
+  Custom
+}
+
+enum AgentActionType {
+  FeeDistribution
+  ChallengeSeeded
+  PrizePoolSeeded
+  AttestationCreated
+  Other
+}
+
+enum ActionStatus {
+  Pending
+  Success
+  Failed
+}
