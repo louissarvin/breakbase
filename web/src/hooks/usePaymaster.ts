@@ -1,0 +1,27 @@
+import { useMemo } from 'react'
+import { useAccount, useCapabilities } from 'wagmi'
+
+const PAYMASTER_URL = import.meta.env.VITE_PAYMASTER_URL as string | undefined
+
+export function usePaymaster() {
+  const { address, chainId } = useAccount()
+  const { data: walletCapabilities } = useCapabilities({ account: address })
+
+  const capabilities = useMemo(() => {
+    if (!walletCapabilities || !chainId || !PAYMASTER_URL) return undefined
+    const chainCaps = walletCapabilities[chainId]
+    if (chainCaps?.paymasterService?.supported) {
+      return {
+        paymasterService: {
+          url: PAYMASTER_URL,
+        },
+      }
+    }
+    return undefined
+  }, [walletCapabilities, chainId])
+
+  return {
+    capabilities,
+    isSponsored: !!capabilities,
+  }
+}
