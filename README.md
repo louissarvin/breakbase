@@ -425,7 +425,7 @@ The FeeDistributor contract accumulates protocol fees and the Protocol Agent wor
 ---
 
 <p align="center">
-  Built for the Base/Coinbase Hackathon
+  Base Batches 003 Student Track
   <br />
   <br />
   <img src="web/public/assets/logo-white.svg" alt="BreakBase" width="120" />
