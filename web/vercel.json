@@ -1,3 +1,9 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [
+    {
+      "source": "/.well-known/farcaster.json",
+      "destination": "https://breakbase-production.up.railway.app/.well-known/farcaster.json"
+    },
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
