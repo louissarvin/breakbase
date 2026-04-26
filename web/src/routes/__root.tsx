@@ -56,6 +56,27 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           'Break the AI. Win the prize. BreakBase is an adversarial AI testing platform built on Base L2.',
       },
       {
+        property: 'og:title',
+        content: 'BreakBase - AI Adversarial Testing Platform',
+      },
+      {
+        property: 'og:description',
+        content:
+          'Break the AI. Win the prize. BreakBase is an adversarial AI testing platform built on Base L2.',
+      },
+      {
+        property: 'og:image',
+        content: `${APP_URL}/assets/logo-index.svg`,
+      },
+      {
+        property: 'og:url',
+        content: APP_URL,
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      {
         name: 'base:app_id',
         content: '69edd865e6b83cf73ad1da94',
       },
