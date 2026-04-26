@@ -28,7 +28,7 @@ import {
   Textarea,
   Tooltip,
 } from '@heroui/react'
-import { useAccount, useSignTypedData } from 'wagmi'
+import { useAccount } from 'wagmi'
 import { getCallsStatus, waitForTransactionReceipt } from 'wagmi/actions'
 import type { Address } from 'viem'
 import type { MessageEntry } from '@/lib/api/hooks'
@@ -60,11 +60,9 @@ import {
   useResolveChallenge,
   useSeedPrizePool,
   useSendMessageOnChain,
-  useSendMessageWithPermit,
   useUSDCAllowance,
 } from '@/lib/contracts/hooks'
 import { usePaymaster } from '@/hooks/usePaymaster'
-import { useFarcasterContext } from '@/providers/FarcasterProvider'
 import { challengeAbi } from '@/lib/contracts/abis'
 import { CONTRACT_ADDRESSES } from '@/lib/contracts/addresses'
 import { config } from '@/config'
@@ -280,25 +278,6 @@ function mapPricing(s: string): string {
   return (s || 'fixed').toLowerCase()
 }
 
-/** Read the EIP-2612 permit nonce for a given owner from the USDC contract. */
-async function getNonce(owner: Address): Promise<bigint> {
-  const { readContract } = await import('wagmi/actions')
-  return readContract(wagmiConfig, {
-    address: CONTRACT_ADDRESSES.usdc,
-    abi: [
-      {
-        type: 'function',
-        name: 'nonces',
-        inputs: [{ name: 'owner', type: 'address' }],
-        outputs: [{ name: '', type: 'uint256' }],
-        stateMutability: 'view',
-      },
-    ],
-    functionName: 'nonces',
-    args: [owner],
-  })
-}
-
 /** Poll getCallsStatus until the batch call is confirmed or fails. */
 async function waitForBatchCall(
   callsId: string,
@@ -343,20 +322,15 @@ function ChatInput({
   const [errorMsg, setErrorMsg] = useState('')
 
   const { capabilities, supportsBatch } = usePaymaster()
-  const isFarcaster = connector?.id === 'farcaster'
 
   const { data: allowance } = useUSDCAllowance(address, challengeAddress)
-  // Batch path (EIP-5792 / Smart Wallet)
+  // Batch path (EIP-5792 / Smart Wallet + Farcaster)
   const { sendWithApproval, data: callsData } = useApproveAndSendMessage()
   useCallsTracker(callsData?.id)
-  // Fallback path (two-step)
+  // Fallback path (two-step for wallets without sendCalls)
   const { approveAsync } = useApproveUSDC()
   const { sendMessageAsync: sendOnChain } =
     useSendMessageOnChain(challengeAddress)
-  // Permit path (single TX via sendCalls, used for Farcaster)
-  const { sendWithPermitAsync, callsData: permitCallsData } = useSendMessageWithPermit(challengeAddress)
-  useCallsTracker(permitCallsData?.id)
-  const { signTypedDataAsync } = useSignTypedData()
   const { mutateAsync: sendMessage } = useSendMessage(challengeId)
 
   const needsApproval = allowance !== undefined && allowance < currentFeeRaw
@@ -366,46 +340,7 @@ function ChatInput({
     setErrorMsg('')
 
     try {
-      if (isFarcaster) {
-        // Permit path: sign EIP-2612 permit off-chain, then single TX
-        setState('approving')
-        const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600)
-        const nonce = await getNonce(address)
-        const signature = await signTypedDataAsync({
-          types: {
-            Permit: [
-              { name: 'owner', type: 'address' },
-              { name: 'spender', type: 'address' },
-              { name: 'value', type: 'uint256' },
-              { name: 'nonce', type: 'uint256' },
-              { name: 'deadline', type: 'uint256' },
-            ],
-          },
-          primaryType: 'Permit',
-          domain: {
-            name: 'USDC',
-            version: '2',
-            chainId: wagmiConfig.chains[0].id,
-            verifyingContract: CONTRACT_ADDRESSES.usdc,
-          },
-          message: {
-            owner: address,
-            spender: challengeAddress,
-            value: currentFeeRaw,
-            nonce,
-            deadline,
-          },
-        })
-        const r = `0x${signature.slice(2, 66)}` as `0x${string}`
-        const s = `0x${signature.slice(66, 130)}` as `0x${string}`
-        const v = parseInt(signature.slice(130, 132), 16)
-
-        setState('sending')
-        const permitResult = await sendWithPermitAsync({ deadline, v, r, s })
-        setState('waiting')
-        const realTxHash = await waitForBatchCall(permitResult.id)
-        await sendMessage({ content: text.trim(), txHash: realTxHash })
-      } else if (supportsBatch) {
+      if (supportsBatch) {
         setState('sending')
         const batchResult = await sendWithApproval({
           challengeAddress,
