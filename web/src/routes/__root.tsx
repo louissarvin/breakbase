@@ -80,40 +80,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         name: 'base:app_id',
         content: '69edd865e6b83cf73ad1da94',
       },
-      {
-        name: 'fc:miniapp',
-        content: JSON.stringify({
-          version: '1',
-          imageUrl: `${config.apiUrl}/frames/og`,
-          button: {
-            title: 'Break an AI',
-            action: {
-              type: 'launch_miniapp',
-              url: APP_URL,
-              name: 'BreakBase',
-              splashImageUrl: `${config.apiUrl}/frames/og`,
-              splashBackgroundColor: '#0A0A0B',
-            },
-          },
-        }),
-      },
-      {
-        name: 'fc:frame',
-        content: JSON.stringify({
-          version: 'next',
-          imageUrl: `${config.apiUrl}/frames/og`,
-          button: {
-            title: 'Break an AI',
-            action: {
-              type: 'launch_frame',
-              url: APP_URL,
-              name: 'BreakBase',
-              splashImageUrl: `${config.apiUrl}/frames/og`,
-              splashBackgroundColor: '#0A0A0B',
-            },
-          },
-        }),
-      },
     ],
     links: [
       {
