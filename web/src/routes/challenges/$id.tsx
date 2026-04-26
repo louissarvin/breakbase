@@ -29,7 +29,7 @@ import {
   Tooltip,
 } from '@heroui/react'
 import { useAccount } from 'wagmi'
-import { getCallsStatus } from 'wagmi/actions'
+import { getCallsStatus, waitForTransactionReceipt } from 'wagmi/actions'
 import type { Address } from 'viem'
 import type { MessageEntry } from '@/lib/api/hooks'
 import { wagmiConfig } from '@/lib/wagmi'
@@ -356,7 +356,8 @@ function ChatInput({
       } else {
         if (needsApproval) {
           setState('approving')
-          await approveAsync(challengeAddress, currentFeeRaw)
+          const approveTxHash = await approveAsync(challengeAddress, currentFeeRaw)
+          await waitForTransactionReceipt(wagmiConfig, { hash: approveTxHash })
         }
         setState('sending')
         const txHash = await sendOnChain()
@@ -798,7 +799,8 @@ function SeedPrizePoolSection({
       } else {
         if (needsApproval) {
           setSeedState('approving')
-          await approveAsync(challengeAddress, amountRaw)
+          const approveTxHash = await approveAsync(challengeAddress, amountRaw)
+          await waitForTransactionReceipt(wagmiConfig, { hash: approveTxHash })
         }
         setSeedState('seeding')
         await seedAsync({

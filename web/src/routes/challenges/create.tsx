@@ -11,7 +11,7 @@ import {
   Textarea,
 } from '@heroui/react'
 import { useAccount, useReadContract } from 'wagmi'
-import { getCallsStatus } from 'wagmi/actions'
+import { getCallsStatus, waitForTransactionReceipt } from 'wagmi/actions'
 import { wagmiConfig } from '@/lib/wagmi'
 import { useAuth } from '@/hooks/useAuth'
 import GlassCard from '@/components/GlassCard'
@@ -362,10 +362,11 @@ function CreateChallengePage() {
       } else {
         if (needsApproval) {
           setSubmitState('approving')
-          await approveAsync(
+          const approveTxHash = await approveAsync(
             CONTRACT_ADDRESSES.challengeFactory,
             totalApprovalRaw,
           )
+          await waitForTransactionReceipt(wagmiConfig, { hash: approveTxHash })
         }
         setSubmitState('creating')
         txHash = (await createChallengeAsync(
