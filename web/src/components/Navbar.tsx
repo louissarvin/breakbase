@@ -1,8 +1,8 @@
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, Menu, Moon, Sun, X } from 'lucide-react'
+import { ChevronDown, LogOut, Menu, Moon, Sun, User, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useAccount } from 'wagmi'
+import { useAccount, useDisconnect } from 'wagmi'
 import ConnectButton from '@/components/ConnectButton'
 import { useBasename } from '@/lib/api/hooks'
 import { cnm } from '@/utils/style'
@@ -28,28 +28,81 @@ function ProfileChip({
   scrolled: boolean
 }) {
   const navigate = useNavigate()
+  const { disconnect } = useDisconnect()
   const { data: basenameData } = useBasename(address, { enabled: !!address })
   const displayName = basenameData?.basename ?? `${address.slice(0, 6)}…${address.slice(-4)}`
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    if (open) {
+      document.addEventListener('mousedown', onClickOutside)
+    }
+    return () => document.removeEventListener('mousedown', onClickOutside)
+  }, [open])
 
   return (
-    <button
-      type="button"
-      onClick={() => navigate({ to: '/profile' })}
-      className={cnm(
-        'flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.03] dark:bg-white/[0.05] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition-all duration-150',
-        scrolled ? 'px-2 py-0.5' : 'px-2.5 py-1',
-      )}
-    >
-      <NavAvatar address={address} />
-      <span
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
         className={cnm(
-          'font-medium text-[#0A0B0D] dark:text-[#F9FAFB] font-mono truncate max-w-[100px]',
-          scrolled ? 'text-[11px]' : 'text-[12px]',
+          'flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.03] dark:bg-white/[0.05] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition-all duration-150',
+          scrolled ? 'px-2 py-0.5' : 'px-2.5 py-1',
         )}
       >
-        {displayName}
-      </span>
-    </button>
+        <NavAvatar address={address} />
+        <span
+          className={cnm(
+            'font-medium text-[#0A0B0D] dark:text-[#F9FAFB] font-mono truncate max-w-[100px]',
+            scrolled ? 'text-[11px]' : 'text-[12px]',
+          )}
+        >
+          {displayName}
+        </span>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            transition={{ duration: 0.15, ease: [0.165, 0.84, 0.44, 1] }}
+            className="absolute top-full right-0 mt-2 min-w-[148px] bg-white/95 dark:bg-[#141518]/95 backdrop-blur-[20px] rounded-xl border border-black/[0.08] dark:border-white/[0.08] shadow-[0_8px_24px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.4)] overflow-hidden"
+          >
+            <div className="flex flex-col p-1.5 gap-0.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false)
+                  navigate({ to: '/profile' })
+                }}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-[#4B5563] dark:text-[#9CA3AF] hover:text-[#0A0B0D] dark:hover:text-[#F9FAFB] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all duration-150 whitespace-nowrap"
+              >
+                <User size={13} />
+                Profile
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false)
+                  disconnect()
+                }}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-[#CF202F] hover:text-[#CF202F] hover:bg-[#CF202F]/[0.08] transition-all duration-150 whitespace-nowrap"
+              >
+                <LogOut size={13} />
+                Disconnect
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 

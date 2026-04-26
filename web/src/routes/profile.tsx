@@ -1,7 +1,8 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { useAccount } from 'wagmi'
+import { useAccount, useDisconnect } from 'wagmi'
 import {
   ExternalLink,
+  LogOut,
   MessageSquare,
   Percent,
   ShieldCheck,
@@ -77,6 +78,7 @@ function DiceBearAvatar({
 
 function ProfilePage() {
   const { address, isConnected } = useAccount()
+  const { disconnect } = useDisconnect()
 
   const { data: me, isLoading: meLoading } = useMe({ enabled: isConnected })
   const { data: basenameData } = useBasename(address ?? '', {
@@ -207,7 +209,7 @@ function ProfilePage() {
             </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.06]">
+          <div className="mt-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.06] flex items-center justify-between gap-4">
             <a
               href={`https://basescan.org/address/${address}`}
               target="_blank"
@@ -217,6 +219,14 @@ function ProfilePage() {
               View on BaseScan
               <ExternalLink size={12} />
             </a>
+            <button
+              type="button"
+              onClick={() => disconnect()}
+              className="inline-flex items-center gap-1.5 text-[#9CA3AF] hover:text-[#CF202F] text-[13px] transition-colors"
+            >
+              <LogOut size={12} />
+              Disconnect
+            </button>
           </div>
         </GlassCard>
 
