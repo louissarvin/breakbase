@@ -80,6 +80,40 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         name: 'base:app_id',
         content: '69edd865e6b83cf73ad1da94',
       },
+      {
+        name: 'fc:miniapp',
+        content: JSON.stringify({
+          version: '1',
+          imageUrl: 'https://breakbase.vercel.app/og-image.png',
+          button: {
+            title: 'Break an AI',
+            action: {
+              type: 'launch_miniapp',
+              url: 'https://breakbase.vercel.app',
+              name: 'BreakBase',
+              splashImageUrl: 'https://breakbase.vercel.app/farcaster/splash-200.png',
+              splashBackgroundColor: '#0A0A0B',
+            },
+          },
+        }),
+      },
+      {
+        name: 'fc:frame',
+        content: JSON.stringify({
+          version: 'next',
+          imageUrl: 'https://breakbase.vercel.app/og-image.png',
+          button: {
+            title: 'Break an AI',
+            action: {
+              type: 'launch_frame',
+              url: 'https://breakbase.vercel.app',
+              name: 'BreakBase',
+              splashImageUrl: 'https://breakbase.vercel.app/farcaster/splash-200.png',
+              splashBackgroundColor: '#0A0A0B',
+            },
+          },
+        }),
+      },
     ],
     links: [
       {

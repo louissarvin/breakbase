@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [
+    { "source": "/.well-known/farcaster.json", "destination": "/.well-known/farcaster.json" },
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
