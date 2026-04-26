@@ -303,6 +303,59 @@ export function useApproveAndSendMessage() {
   }
 }
 
+// Single-call sendCalls hooks for Farcaster (two-step via sendCalls)
+
+export function useApproveViaSendCalls() {
+  const { sendCallsAsync, ...rest } = useSendCalls()
+
+  return {
+    approveViaSendCalls: (params: {
+      spender: `0x${string}`
+      amount: bigint
+      capabilities?: PaymasterCapabilities
+    }) =>
+      sendCallsAsync({
+        calls: [
+          {
+            to: config.contracts.usdc,
+            data: encodeFunctionData({
+              abi: erc20Abi,
+              functionName: 'approve',
+              args: [params.spender, params.amount],
+            }),
+          },
+        ],
+        capabilities: params.capabilities,
+      }),
+    ...rest,
+  }
+}
+
+export function useSendMessageViaSendCalls() {
+  const { sendCallsAsync, ...rest } = useSendCalls()
+
+  return {
+    sendMessageViaSendCalls: (params: {
+      challengeAddress: `0x${string}`
+      capabilities?: PaymasterCapabilities
+    }) =>
+      sendCallsAsync({
+        calls: [
+          {
+            to: params.challengeAddress,
+            data: encodeFunctionData({
+              abi: challengeAbi,
+              functionName: 'sendMessage',
+              args: [],
+            }),
+          },
+        ],
+        capabilities: params.capabilities,
+      }),
+    ...rest,
+  }
+}
+
 export function useApproveAndCreateChallenge() {
   const { sendCallsAsync, ...rest } = useSendCalls()
 

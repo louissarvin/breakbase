@@ -47,6 +47,7 @@ import {
   useApproveAndSeedPrizePool,
   useApproveAndSendMessage,
   useApproveUSDC,
+  useApproveViaSendCalls,
   useCallsTracker,
   useCancelChallenge,
   useCancelEmergencyWithdrawal,
@@ -60,6 +61,7 @@ import {
   useResolveChallenge,
   useSeedPrizePool,
   useSendMessageOnChain,
+  useSendMessageViaSendCalls,
   useUSDCAllowance,
 } from '@/lib/contracts/hooks'
 import { usePaymaster } from '@/hooks/usePaymaster'
@@ -322,11 +324,15 @@ function ChatInput({
   const [errorMsg, setErrorMsg] = useState('')
 
   const { capabilities, supportsBatch } = usePaymaster()
+  const isFarcaster = connector?.id === 'farcaster'
 
   const { data: allowance } = useUSDCAllowance(address, challengeAddress)
-  // Batch path (EIP-5792 / Smart Wallet + Farcaster)
+  // Batch path (EIP-5792 / Smart Wallet)
   const { sendWithApproval, data: callsData } = useApproveAndSendMessage()
   useCallsTracker(callsData?.id)
+  // Farcaster two-step path (separate sendCalls for approve + sendMessage)
+  const { approveViaSendCalls } = useApproveViaSendCalls()
+  const { sendMessageViaSendCalls } = useSendMessageViaSendCalls()
   // Fallback path (two-step for wallets without sendCalls)
   const { approveAsync } = useApproveUSDC()
   const { sendMessageAsync: sendOnChain } =
@@ -340,7 +346,31 @@ function ChatInput({
     setErrorMsg('')
 
     try {
-      if (supportsBatch) {
+      if (isFarcaster) {
+        // Farcaster: two separate sendCalls (approve then sendMessage)
+        // Batching both in one sendCalls reverts because Warpcast
+        // may not execute them atomically within a single tx.
+        if (needsApproval) {
+          setState('approving')
+          const approveResult = await approveViaSendCalls({
+            spender: challengeAddress,
+            amount: currentFeeRaw,
+            capabilities: capabilities ?? undefined,
+          })
+          await waitForBatchCall(approveResult.id)
+        }
+        setState('sending')
+        const sendResult = await sendMessageViaSendCalls({
+          challengeAddress,
+          capabilities: capabilities ?? undefined,
+        })
+        setState('waiting')
+        const realTxHash = await waitForBatchCall(sendResult.id)
+        await sendMessage({
+          content: text.trim(),
+          txHash: realTxHash,
+        })
+      } else if (supportsBatch) {
         setState('sending')
         const batchResult = await sendWithApproval({
           challengeAddress,
