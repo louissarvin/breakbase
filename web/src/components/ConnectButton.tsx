@@ -33,7 +33,7 @@ export default function ConnectButton() {
 
   function handleConnect() {
     if (isInMiniApp) {
-      const farcasterConnector = connectors.find((c) => c.id === 'farcasterFrame')
+      const farcasterConnector = connectors.find((c) => c.id === 'farcaster')
       if (farcasterConnector) {
         connect({ connector: farcasterConnector })
         return

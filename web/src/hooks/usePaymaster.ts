@@ -4,7 +4,7 @@ import { useAccount, useCapabilities } from 'wagmi'
 const PAYMASTER_URL = import.meta.env.VITE_PAYMASTER_URL as string | undefined
 
 export function usePaymaster() {
-  const { address, chainId } = useAccount()
+  const { address, chainId, connector } = useAccount()
   const { data: walletCapabilities } = useCapabilities({ account: address })
 
   const capabilities = useMemo(() => {
@@ -20,13 +20,16 @@ export function usePaymaster() {
     return undefined
   }, [walletCapabilities, chainId])
 
-  // Detect if wallet supports batch calls (EIP-5792) independently from paymaster
+  // Detect if wallet supports batch calls (EIP-5792) independently from paymaster.
+  // Farcaster wallet supports wallet_sendCalls but may not advertise atomicBatch
+  // in capabilities, so also check the connector id as a fallback.
   const supportsBatch = useMemo(() => {
+    // Farcaster wallet supports wallet_sendCalls (EIP-5792)
+    if (connector?.id === 'farcaster') return true
     if (!walletCapabilities || !chainId) return false
     const chainCaps = walletCapabilities[chainId]
-    // atomicBatch is the EIP-5792 capability for batched calls
     return !!(chainCaps?.atomicBatch?.supported || chainCaps?.paymasterService?.supported)
-  }, [walletCapabilities, chainId])
+  }, [walletCapabilities, chainId, connector])
 
   return {
     capabilities,

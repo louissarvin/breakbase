@@ -36,7 +36,7 @@ export function useFarcaster() {
   useEffect(() => {
     if (isInMiniApp && isReady && !isConnected && !autoConnected.current) {
       autoConnected.current = true
-      const farcasterConnector = connectors.find((c) => c.id === 'farcasterFrame')
+      const farcasterConnector = connectors.find((c) => c.id === 'farcaster')
       if (farcasterConnector) {
         connect({ connector: farcasterConnector })
       }
