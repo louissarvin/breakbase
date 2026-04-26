@@ -494,12 +494,13 @@ function HowItWorksParallax() {
     })
 
     const finalTime = (cards.length - 1) * 4 + 3
+    const fanOffset = window.innerWidth < 480 ? 70 : 110
     cards.forEach((card, i) => {
       const centerOffset = i - Math.floor(cards.length / 2)
       tl.to(
         card,
         {
-          x: centerOffset * 110,
+          x: centerOffset * fanOffset,
           y: 0,
           scale: 0.85,
           opacity: 1,
@@ -535,7 +536,7 @@ function HowItWorksParallax() {
       </div>
 
       <div
-        className="relative w-full max-w-[420px] h-[320px]"
+        className="relative w-full max-w-[320px] sm:max-w-[420px] h-[320px]"
         style={{ perspective: '1000px' }}
       >
         {HOW_IT_WORKS.map((step, i) => (

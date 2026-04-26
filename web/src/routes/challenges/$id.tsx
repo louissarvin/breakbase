@@ -1378,8 +1378,8 @@ function ChallengePage() {
             {/* Insights - x402 gated */}
             <InsightsSection challengeId={id} />
 
-            {/* Seed Prize Pool - visible to all */}
-            {config.features.prizePoolSeeding && challengeAddress && (
+            {/* Seed Prize Pool - defender only */}
+            {config.features.prizePoolSeeding && isOwner && challengeAddress && (
               <SeedPrizePoolSection challengeAddress={challengeAddress} />
             )}
 
