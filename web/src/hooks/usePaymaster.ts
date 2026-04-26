@@ -20,12 +20,12 @@ export function usePaymaster() {
     return undefined
   }, [walletCapabilities, chainId])
 
-  // Detect if wallet supports batch calls (EIP-5792) independently from paymaster.
-  // Farcaster wallet supports wallet_sendCalls but may not advertise atomicBatch
-  // in capabilities, so also check the connector id as a fallback.
+  // Detect if wallet supports atomic batch calls (EIP-5792).
+  // Farcaster wallet supports wallet_sendCalls but executes sequentially (not
+  // atomically), which can cause the second call to revert if the first hasn't
+  // settled. Use the two-step fallback with waitForTransactionReceipt instead.
   const supportsBatch = useMemo(() => {
-    // Farcaster wallet supports wallet_sendCalls (EIP-5792)
-    if (connector?.id === 'farcaster') return true
+    if (connector?.id === 'farcaster') return false
     if (!walletCapabilities || !chainId) return false
     const chainCaps = walletCapabilities[chainId]
     return !!(chainCaps?.atomicBatch?.supported || chainCaps?.paymasterService?.supported)
