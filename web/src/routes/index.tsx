@@ -393,7 +393,7 @@ function StatsSection({
 }) {
   if (!challenges) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div className="grid grid-cols-3 gap-3 sm:gap-5">
         {[0, 1, 2].map((i) => (
           <GlassCard key={i} className="text-center">
             <Skeleton className="h-8 w-24 mx-auto mb-2 rounded-lg bg-[#F3F4F6] dark:bg-[#141518] skeleton-shimmer" />
@@ -421,7 +421,7 @@ function StatsSection({
 
   return (
     <motion.div
-      className="grid grid-cols-1 sm:grid-cols-3 gap-5"
+      className="grid grid-cols-3 gap-3 sm:gap-5"
       variants={stagger}
       initial="hidden"
       whileInView="show"
@@ -431,12 +431,12 @@ function StatsSection({
         <motion.div key={label} variants={fadeUp}>
           <GlassCard hover className="text-center">
             <div className="flex items-center justify-center gap-2 mb-1">
-              <span className="text-[#9CA3AF] text-[12px] uppercase tracking-[0.5px] font-semibold">
+              <span className="text-[#9CA3AF] text-[11px] sm:text-[12px] uppercase tracking-[0.5px] font-semibold">
                 {label}
               </span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <p className="text-[40px] font-semibold text-[#0A0B0D] dark:text-[#F9FAFB] leading-tight tracking-[-0.5px]">
+              <p className="text-[24px] sm:text-[40px] font-semibold text-[#0A0B0D] dark:text-[#F9FAFB] leading-tight tracking-[-0.5px]">
                 <CountUpNumber value={value} />
               </p>
             </div>

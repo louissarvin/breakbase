@@ -142,10 +142,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
     <>
       <Navbar />
       <main
-        className={cnm(
-          'min-h-screen bg-[#FDFDFF] dark:bg-[#0A0B0D] relative z-10',
-          isInMiniApp ? 'pt-0' : 'rounded-b-[2.5rem] pt-16',
-        )}
+        className="min-h-screen bg-[#FDFDFF] dark:bg-[#0A0B0D] relative z-10 rounded-b-[2.5rem] pt-16"
       >
         {children}
       </main>
