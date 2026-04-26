@@ -70,7 +70,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
       {
         property: 'og:url',
-        content: APP_URL,
+        content: 'https://breakbase.vercel.app',
       },
       {
         property: 'og:type',
@@ -116,6 +116,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
     links: [
+      {
+        rel: 'manifest',
+        href: '/manifest.json',
+      },
       {
         rel: 'icon',
         type: 'image/svg+xml',
