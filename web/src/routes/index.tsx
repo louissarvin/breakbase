@@ -393,7 +393,7 @@ function StatsSection({
 }) {
   if (!challenges) {
     return (
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         {[0, 1, 2].map((i) => (
           <GlassCard key={i} className="text-center">
             <Skeleton className="h-8 w-24 mx-auto mb-2 rounded-lg bg-[#F3F4F6] dark:bg-[#141518] skeleton-shimmer" />

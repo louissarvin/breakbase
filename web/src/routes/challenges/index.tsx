@@ -125,7 +125,7 @@ function ChallengesPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-[40px] font-semibold text-[#0A0B0D] dark:text-[#F9FAFB] tracking-[-0.02em] leading-[1.1]">
+            <h1 className="text-[28px] sm:text-[40px] font-semibold text-[#0A0B0D] dark:text-[#F9FAFB] tracking-[-0.02em] leading-[1.1]">
               Challenges
             </h1>
             <p className="text-[#4B5563] dark:text-[#D1D5DB] text-[17px] mt-1">

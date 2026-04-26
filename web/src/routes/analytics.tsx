@@ -375,7 +375,7 @@ function OWASPSection({
                         {cat.total.toLocaleString()} defended
                       </p>
                     </div>
-                    <div className="w-36 shrink-0">
+                    <div className="w-24 sm:w-36 shrink-0">
                       <DefenseRateBar rate={cat.defenseRate} />
                     </div>
                     <div className="text-[#9CA3AF] dark:text-[#6B7280] shrink-0 ml-1">
@@ -1035,7 +1035,7 @@ function AnalyticsPage() {
       <div className="max-w-[980px] mx-auto">
         <AnimateComponent entry="fadeInUp">
           <div className="mb-12">
-            <h1 className="text-[40px] font-semibold text-[#0A0B0D] dark:text-[#F9FAFB] tracking-[-0.02em] leading-[1.1] mb-2">
+            <h1 className="text-[28px] sm:text-[40px] font-semibold text-[#0A0B0D] dark:text-[#F9FAFB] tracking-[-0.02em] leading-[1.1] mb-2">
               Analytics
             </h1>
             <p className="text-[#4B5563] dark:text-[#D1D5DB] text-[17px]">

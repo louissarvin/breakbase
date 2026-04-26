@@ -472,7 +472,7 @@ function CreateChallengePage() {
         {isConnected && !isAuthenticated && (
           <GlassCard
             variant="subtle"
-            className="mb-8 p-4 flex items-center gap-3 justify-between"
+            className="mb-8 p-4 flex flex-wrap items-center gap-3 justify-between"
           >
             <div className="flex items-center gap-3">
               <AlertCircle size={16} className="text-[#ED702F] shrink-0" />

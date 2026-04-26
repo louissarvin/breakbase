@@ -1104,7 +1104,7 @@ function ChallengePage() {
         {/* Page header */}
         <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex flex-wrap items-center gap-3 mb-2">
               <StatusBadge status={mapStatus(challenge.status)} />
               {challenge.challengeType &&
                 challenge.challengeType !== 'Custom' && (
@@ -1164,8 +1164,7 @@ function ChallengePage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
           {/* Left: Chat */}
           <GlassCard
-            className="p-0 overflow-hidden flex flex-col"
-            style={{ minHeight: 520 }}
+            className="p-0 overflow-hidden flex flex-col min-h-[60vh] lg:min-h-[520px]"
           >
             {/* Chat header */}
             <div className="px-5 py-4 border-b border-black/[0.06] dark:border-white/[0.06] flex items-center gap-3">
@@ -1184,8 +1183,7 @@ function ChallengePage() {
 
             {/* Messages */}
             <div
-              className="flex-1 overflow-y-auto px-5"
-              style={{ maxHeight: 480 }}
+              className="flex-1 overflow-y-auto px-5 max-h-[40vh] lg:max-h-[480px]"
             >
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full py-16 text-center">

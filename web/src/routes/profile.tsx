@@ -196,7 +196,7 @@ function ProfilePage() {
               )}
             </div>
 
-            <div className="flex flex-col gap-1 text-right shrink-0">
+            <div className="flex flex-col gap-1 sm:text-right shrink-0">
               <p className="text-[#9CA3AF] text-[12px] uppercase tracking-[0.5px] font-semibold">
                 USDC Balance
               </p>

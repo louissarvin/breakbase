@@ -632,7 +632,7 @@ function TestSuitePage() {
         {/* Header */}
         <div className="flex items-start gap-4 mb-10">
           <div>
-            <h1 className="text-[36px] font-semibold text-[#0A0B0D] dark:text-[#F9FAFB] tracking-[-0.02em] leading-[1.1] mb-1.5">
+            <h1 className="text-[28px] sm:text-[36px] font-semibold text-[#0A0B0D] dark:text-[#F9FAFB] tracking-[-0.02em] leading-[1.1] mb-1.5">
               Security Test Suite
             </h1>
             <p className="text-[#4B5563] dark:text-[#D1D5DB] text-[16px]">

@@ -22,28 +22,28 @@ const TAB_CONFIG: Array<{
 }> = [
   {
     key: 'wins',
-    label: 'Top Winners',
+    label: 'Winners',
     icon: Trophy,
     metric: 'Wins',
     format: (v) => v.toString(),
   },
   {
     key: 'messages',
-    label: 'Most Active',
+    label: 'Active',
     icon: MessageSquare,
     metric: 'Attacks',
     format: (v) => v.toLocaleString(),
   },
   {
     key: 'earnings',
-    label: 'Top Earners',
+    label: 'Earners',
     icon: DollarSign,
     metric: 'Earned',
     format: (v) => `$${v.toFixed(2)}`,
   },
   {
     key: 'spent',
-    label: 'Most Spent',
+    label: 'Spent',
     icon: TrendingUp,
     metric: 'Spent',
     format: (v) => `$${v.toFixed(2)}`,
