@@ -106,6 +106,46 @@ function ProfileChip({
   )
 }
 
+function MobileProfileSection({
+  address,
+  onClose,
+}: {
+  address: string
+  onClose: () => void
+}) {
+  const navigate = useNavigate()
+  const { disconnect } = useDisconnect()
+  const { data: basenameData } = useBasename(address, { enabled: !!address })
+  const displayName = basenameData?.basename ?? `${address.slice(0, 6)}…${address.slice(-4)}`
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <button
+        type="button"
+        onClick={() => {
+          onClose()
+          navigate({ to: '/profile' })
+        }}
+        className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[15px] font-medium text-[#4B5563] dark:text-[#9CA3AF] hover:text-[#0A0B0D] dark:hover:text-[#F9FAFB] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all duration-150"
+      >
+        <NavAvatar address={address} />
+        <span className="font-mono text-[13px] truncate">{displayName}</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          onClose()
+          disconnect()
+        }}
+        className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[15px] font-medium text-[#CF202F] hover:bg-[#CF202F]/[0.08] transition-all duration-150"
+      >
+        <LogOut size={16} />
+        Disconnect
+      </button>
+    </div>
+  )
+}
+
 const NAV_LINKS = [
   { label: 'Challenges', to: '/challenges' },
   { label: 'Leaderboard', to: '/leaderboard' },
@@ -376,13 +416,14 @@ export default function Navbar() {
                   </Link>
                 )
               })}
-              <div className="mt-2 px-4 pb-1">
-                {isConnected && address ? (
-                  <ProfileChip address={address} scrolled={false} />
-                ) : (
+              <div className="my-1 mx-1 h-px bg-black/[0.06] dark:bg-white/[0.06]" />
+              {isConnected && address ? (
+                <MobileProfileSection address={address} onClose={() => setMobileOpen(false)} />
+              ) : (
+                <div className="mt-2 px-4 pb-1">
                   <ConnectButton />
-                )}
-              </div>
+                </div>
+              )}
             </nav>
           </motion.div>
         )}
