@@ -56,6 +56,7 @@ VC_INSIGHTS.md
 # Images (screenshots)
 *.png
 !web/public/farcaster/*.png
+!web/public/og-image.png
 
 # Misc
 todos.json

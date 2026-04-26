@@ -66,7 +66,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
       {
         property: 'og:image',
-        content: 'https://breakbase.vercel.app/farcaster/icon-1024.png',
+        content: 'https://breakbase.vercel.app/og-image.png',
       },
       {
         property: 'og:url',
