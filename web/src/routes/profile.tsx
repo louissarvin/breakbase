@@ -57,71 +57,21 @@ function StatCard({
   )
 }
 
-function AvatarGradient({
+function DiceBearAvatar({
   address,
   size = 64,
 }: {
   address: string
   size?: number
 }) {
-  const h0 = parseInt(address.slice(2, 6), 16) % 360
-  const h1 = (h0 + 60) % 360
-  const h2 = (h0 + 140) % 360
-  const h3 = (h0 + 220) % 360
-  const ox = ((parseInt(address.slice(6, 8), 16) / 255) * 40 + 10).toFixed(1)
-  const oy = ((parseInt(address.slice(8, 10), 16) / 255) * 40 + 10).toFixed(1)
-  const r0 = ((parseInt(address.slice(10, 12), 16) / 255) * 12 + 14).toFixed(1)
-  const r1 = ((parseInt(address.slice(12, 14), 16) / 255) * 10 + 12).toFixed(1)
-  const r2 = ((parseInt(address.slice(14, 16), 16) / 255) * 8 + 10).toFixed(1)
-  const id = address.slice(2, 10)
-
   return (
-    <svg
+    <img
+      src={`https://api.dicebear.com/9.x/bottts/svg?seed=${encodeURIComponent(address)}`}
+      alt="Avatar"
       width={size}
       height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="rounded-full shrink-0"
-      aria-hidden="true"
-    >
-      <defs>
-        <radialGradient
-          id={`bg-${id}`}
-          cx="50%"
-          cy="50%"
-          r="70%"
-          fx="30%"
-          fy="30%"
-        >
-          <stop offset="0%" stopColor={`hsl(${h0},75%,52%)`} />
-          <stop offset="100%" stopColor={`hsl(${h1},65%,32%)`} />
-        </radialGradient>
-        <radialGradient id={`b0-${id}`} cx="50%" cy="50%" r="60%">
-          <stop offset="0%" stopColor={`hsl(${h2},80%,65%)`} stopOpacity="0.7" />
-          <stop offset="100%" stopColor={`hsl(${h2},70%,50%)`} stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id={`b1-${id}`} cx="50%" cy="50%" r="60%">
-          <stop offset="0%" stopColor={`hsl(${h3},85%,70%)`} stopOpacity="0.6" />
-          <stop offset="100%" stopColor={`hsl(${h3},70%,55%)`} stopOpacity="0" />
-        </radialGradient>
-        <clipPath id={`clip-${id}`}>
-          <circle cx="32" cy="32" r="32" />
-        </clipPath>
-      </defs>
-      <circle cx="32" cy="32" r="32" fill={`url(#bg-${id})`} />
-      <g clipPath={`url(#clip-${id})`}>
-        <circle cx={ox} cy={oy} r={r0} fill={`url(#b0-${id})`} />
-        <circle
-          cx={(64 - parseFloat(ox)).toFixed(1)}
-          cy={(64 - parseFloat(oy)).toFixed(1)}
-          r={r1}
-          fill={`url(#b1-${id})`}
-        />
-        <circle cx="32" cy="38" r={r2} fill="white" fillOpacity="0.08" />
-        <circle cx="32" cy="32" r="32" fill="white" fillOpacity="0.04" />
-      </g>
-    </svg>
+      className="rounded-full shrink-0 bg-[#F3F4F6] dark:bg-[#141518]"
+    />
   )
 }
 
@@ -145,9 +95,6 @@ function ProfilePage() {
     return (
       <div className="min-h-screen bg-white dark:bg-[#0A0B0D] px-4 py-20 flex items-center justify-center">
         <GlassCard className="text-center max-w-sm p-8">
-          <div className="w-14 h-14 rounded-2xl bg-[#0052FF]/10 flex items-center justify-center mx-auto mb-5">
-            <ShieldCheck size={24} className="text-[#0052FF]" />
-          </div>
           <h2 className="text-[21px] font-bold text-[#0A0B0D] dark:text-[#F9FAFB] mb-2">
             Connect to view profile
           </h2>
@@ -204,7 +151,7 @@ function ProfilePage() {
                 className="w-16 h-16 rounded-full object-cover shrink-0"
               />
             ) : (
-              <AvatarGradient address={address!} />
+              <DiceBearAvatar address={address!} />
             )}
 
             <div className="flex-1 min-w-0">
