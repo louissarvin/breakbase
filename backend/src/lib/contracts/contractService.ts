@@ -16,7 +16,8 @@ export function getProvider(): JsonRpcProvider {
   if (!provider) {
     const fetchReq = new ethers.FetchRequest(RPC_URL);
     fetchReq.timeout = 8_000; // 8s timeout – keeps worst-case retry loop under 60s
-    provider = new JsonRpcProvider(fetchReq);
+    const staticNetwork = new ethers.Network('base-sepolia', 84532);
+    provider = new JsonRpcProvider(fetchReq, staticNetwork, { staticNetwork: true });
   }
   return provider;
 }
