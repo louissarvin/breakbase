@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useBasename } from '@/lib/api/hooks'
 import { useAuth } from '@/hooks/useAuth'
+import { useFarcasterContext } from '@/providers/FarcasterProvider'
 
 function truncateAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -23,21 +24,28 @@ export default function ConnectButton() {
   const { data: basenameData } = useBasename(address ?? '')
   const [copied, setCopied] = useState(false)
   const { isAuthenticated, login, logout } = useAuth()
-
-  // No auto-login: Smart Wallet uses popups for signing, which browsers block
-  // unless triggered by a direct user click. Users sign in via the button below.
+  const { isInMiniApp } = useFarcasterContext()
 
   function handleDisconnect() {
     logout()
     disconnect()
   }
 
+  function handleConnect() {
+    if (isInMiniApp) {
+      const farcasterConnector = connectors.find((c) => c.id === 'farcasterFrame')
+      if (farcasterConnector) {
+        connect({ connector: farcasterConnector })
+        return
+      }
+    }
+    connect({ connector: connectors[0] })
+  }
+
   if (!isConnected || !address) {
     return (
       <Button
-        onPress={() => {
-          connect({ connector: connectors[0] })
-        }}
+        onPress={handleConnect}
         className="bg-[#0052FF] hover:bg-[#3377FF] text-white rounded-full px-5 py-2 text-sm font-semibold transition-colors duration-150"
         size="sm"
       >
