@@ -139,6 +139,27 @@ export function useSendMessageOnChain(cloneAddress: Address | undefined) {
   }
 }
 
+export function useSendMessageWithPermit(cloneAddress: Address | undefined) {
+  const { mutateAsync, ...rest } = useWriteContract()
+  return {
+    sendWithPermitAsync: (params: {
+      deadline: bigint
+      v: number
+      r: `0x${string}`
+      s: `0x${string}`
+    }) => {
+      if (!cloneAddress) throw new Error('cloneAddress is required')
+      return mutateAsync({
+        address: cloneAddress,
+        abi: challengeAbi,
+        functionName: 'sendMessageWithPermit',
+        args: [params.deadline, params.v, params.r, params.s],
+      })
+    },
+    ...rest,
+  }
+}
+
 // Emergency withdrawal
 
 export function useEmergencyRequestedAt(challengeAddress: `0x${string}`) {
