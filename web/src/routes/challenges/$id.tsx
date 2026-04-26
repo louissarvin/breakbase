@@ -321,11 +321,10 @@ function ChatInput({
   const [state, setState] = useState<SendState>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  const { capabilities } = usePaymaster()
-  const supportsBatch = !!capabilities
+  const { capabilities, supportsBatch } = usePaymaster()
 
   const { data: allowance } = useUSDCAllowance(address, challengeAddress)
-  // Batch path (EIP-5792 / Smart Wallet)
+  // Batch path (EIP-5792 / Smart Wallet / Farcaster)
   const { sendWithApproval, data: callsData } = useApproveAndSendMessage()
   useCallsTracker(callsData?.id)
   // Fallback path (two-step)
@@ -346,7 +345,7 @@ function ChatInput({
         const batchResult = await sendWithApproval({
           challengeAddress,
           fee: currentFeeRaw,
-          capabilities,
+          capabilities: capabilities ?? undefined,
         })
         setState('waiting')
         const realTxHash = await waitForBatchCall(batchResult.id)
@@ -769,11 +768,10 @@ function SeedPrizePoolSection({
   const amountNum = parseFloat(amount) || 0
   const amountRaw = BigInt(Math.round(amountNum * 1e6))
 
-  const { capabilities: seedCapabilities } = usePaymaster()
-  const supportsBatch = !!seedCapabilities
+  const { capabilities: seedCapabilities, supportsBatch } = usePaymaster()
 
   const { data: allowance } = useUSDCAllowance(address, challengeAddress)
-  // Batch path (EIP-5792 / Smart Wallet)
+  // Batch path (EIP-5792 / Smart Wallet / Farcaster)
   const { seedWithApproval, data: seedCallsData } = useApproveAndSeedPrizePool()
   useCallsTracker(seedCallsData?.id)
   // Fallback path (two-step)
@@ -793,7 +791,7 @@ function SeedPrizePoolSection({
         const batchResult = await seedWithApproval({
           challengeAddress,
           amount: amountRaw,
-          capabilities: seedCapabilities,
+          capabilities: seedCapabilities ?? undefined,
         })
         // Wait for batch call to actually confirm on-chain
         await waitForBatchCall(batchResult.id)

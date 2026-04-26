@@ -237,9 +237,8 @@ function CreateChallengePage() {
     address,
     CONTRACT_ADDRESSES.challengeFactory,
   )
-  const { capabilities } = usePaymaster()
-  const supportsBatch = !!capabilities
-  // Batch path (EIP-5792 / Smart Wallet)
+  const { capabilities, supportsBatch } = usePaymaster()
+  // Batch path (EIP-5792 / Smart Wallet / Farcaster)
   const { createWithApproval, data: callsData } = useApproveAndCreateChallenge()
   useCallsTracker(callsData?.id)
   // Fallback path (two-step)
@@ -321,7 +320,7 @@ function CreateChallengePage() {
           seedAmount: seedAmountRaw,
           factoryAddress: CONTRACT_ADDRESSES.challengeFactory,
           challengeConfig,
-          capabilities,
+          capabilities: capabilities ?? undefined,
         })
 
         // Poll for batch completion to get the real transaction hash
