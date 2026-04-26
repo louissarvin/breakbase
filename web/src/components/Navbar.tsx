@@ -1,10 +1,100 @@
-import { Link, useRouterState } from '@tanstack/react-router'
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { ChevronDown, Menu, Moon, Sun, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useAccount } from 'wagmi'
 import ConnectButton from '@/components/ConnectButton'
+import { useBasename } from '@/lib/api/hooks'
 import { cnm } from '@/utils/style'
 import { useTheme } from '@/providers/ThemeProvider'
+
+function NavAvatar({ address }: { address: string }) {
+  const h0 = parseInt(address.slice(2, 6), 16) % 360
+  const h1 = (h0 + 60) % 360
+  const h2 = (h0 + 140) % 360
+  const h3 = (h0 + 220) % 360
+  const ox = ((parseInt(address.slice(6, 8), 16) / 255) * 40 + 10).toFixed(1)
+  const oy = ((parseInt(address.slice(8, 10), 16) / 255) * 40 + 10).toFixed(1)
+  const r0 = ((parseInt(address.slice(10, 12), 16) / 255) * 12 + 14).toFixed(1)
+  const r1 = ((parseInt(address.slice(12, 14), 16) / 255) * 10 + 12).toFixed(1)
+  const r2 = ((parseInt(address.slice(14, 16), 16) / 255) * 8 + 10).toFixed(1)
+  const id = `nav-${address.slice(2, 10)}`
+
+  return (
+    <svg
+      width={28}
+      height={28}
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="rounded-full shrink-0"
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id={`bg-${id}`} cx="50%" cy="50%" r="70%" fx="30%" fy="30%">
+          <stop offset="0%" stopColor={`hsl(${h0},75%,52%)`} />
+          <stop offset="100%" stopColor={`hsl(${h1},65%,32%)`} />
+        </radialGradient>
+        <radialGradient id={`b0-${id}`} cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stopColor={`hsl(${h2},80%,65%)`} stopOpacity="0.7" />
+          <stop offset="100%" stopColor={`hsl(${h2},70%,50%)`} stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={`b1-${id}`} cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stopColor={`hsl(${h3},85%,70%)`} stopOpacity="0.6" />
+          <stop offset="100%" stopColor={`hsl(${h3},70%,55%)`} stopOpacity="0" />
+        </radialGradient>
+        <clipPath id={`clip-${id}`}>
+          <circle cx="32" cy="32" r="32" />
+        </clipPath>
+      </defs>
+      <circle cx="32" cy="32" r="32" fill={`url(#bg-${id})`} />
+      <g clipPath={`url(#clip-${id})`}>
+        <circle cx={ox} cy={oy} r={r0} fill={`url(#b0-${id})`} />
+        <circle
+          cx={(64 - parseFloat(ox)).toFixed(1)}
+          cy={(64 - parseFloat(oy)).toFixed(1)}
+          r={r1}
+          fill={`url(#b1-${id})`}
+        />
+        <circle cx="32" cy="38" r={r2} fill="white" fillOpacity="0.08" />
+        <circle cx="32" cy="32" r="32" fill="white" fillOpacity="0.04" />
+      </g>
+    </svg>
+  )
+}
+
+function ProfileChip({
+  address,
+  scrolled,
+}: {
+  address: string
+  scrolled: boolean
+}) {
+  const navigate = useNavigate()
+  const { data: basenameData } = useBasename(address, { enabled: !!address })
+  const displayName = basenameData?.basename ?? `${address.slice(0, 6)}…${address.slice(-4)}`
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate({ to: '/profile' })}
+      className={cnm(
+        'flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.03] dark:bg-white/[0.05] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition-all duration-150',
+        scrolled ? 'px-2 py-0.5' : 'px-2.5 py-1',
+      )}
+    >
+      <NavAvatar address={address} />
+      <span
+        className={cnm(
+          'font-medium text-[#0A0B0D] dark:text-[#F9FAFB] font-mono truncate max-w-[100px]',
+          scrolled ? 'text-[11px]' : 'text-[12px]',
+        )}
+      >
+        {displayName}
+      </span>
+    </button>
+  )
+}
 
 const NAV_LINKS = [
   { label: 'Challenges', to: '/challenges' },
@@ -26,6 +116,7 @@ export default function Navbar() {
   const routerState = useRouterState()
   const currentPath = routerState.location.pathname
   const { theme, toggleTheme } = useTheme()
+  const { address, isConnected } = useAccount()
 
   const isMoreActive = MORE_LINKS.some(
     (link) => currentPath === link.to || currentPath.startsWith(link.to + '/'),
@@ -198,14 +289,18 @@ export default function Navbar() {
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
-          {/* Connect button */}
+          {/* Connect / profile */}
           <div
             className={cnm(
               'hidden md:block transition-all duration-300 hover:-translate-y-px origin-center',
               scrolled ? 'scale-[0.88]' : 'scale-100',
             )}
           >
-            <ConnectButton />
+            {isConnected && address ? (
+              <ProfileChip address={address} scrolled={scrolled} />
+            ) : (
+              <ConnectButton />
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -272,7 +367,11 @@ export default function Navbar() {
                 )
               })}
               <div className="mt-2 px-4 pb-1">
-                <ConnectButton />
+                {isConnected && address ? (
+                  <ProfileChip address={address} scrolled={false} />
+                ) : (
+                  <ConnectButton />
+                )}
               </div>
             </nav>
           </motion.div>
