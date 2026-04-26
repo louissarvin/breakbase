@@ -140,7 +140,7 @@ export function useSendMessageOnChain(cloneAddress: Address | undefined) {
 }
 
 export function useSendMessageWithPermit(cloneAddress: Address | undefined) {
-  const { mutateAsync, ...rest } = useWriteContract()
+  const { sendCallsAsync, data, ...rest } = useSendCalls()
   return {
     sendWithPermitAsync: (params: {
       deadline: bigint
@@ -149,13 +149,20 @@ export function useSendMessageWithPermit(cloneAddress: Address | undefined) {
       s: `0x${string}`
     }) => {
       if (!cloneAddress) throw new Error('cloneAddress is required')
-      return mutateAsync({
-        address: cloneAddress,
-        abi: challengeAbi,
-        functionName: 'sendMessageWithPermit',
-        args: [params.deadline, params.v, params.r, params.s],
+      return sendCallsAsync({
+        calls: [
+          {
+            to: cloneAddress,
+            data: encodeFunctionData({
+              abi: challengeAbi,
+              functionName: 'sendMessageWithPermit',
+              args: [params.deadline, params.v, params.r, params.s],
+            }),
+          },
+        ],
       })
     },
+    callsData: data,
     ...rest,
   }
 }

@@ -353,8 +353,9 @@ function ChatInput({
   const { approveAsync } = useApproveUSDC()
   const { sendMessageAsync: sendOnChain } =
     useSendMessageOnChain(challengeAddress)
-  // Permit path (single TX, used for Farcaster)
-  const { sendWithPermitAsync } = useSendMessageWithPermit(challengeAddress)
+  // Permit path (single TX via sendCalls, used for Farcaster)
+  const { sendWithPermitAsync, callsData: permitCallsData } = useSendMessageWithPermit(challengeAddress)
+  useCallsTracker(permitCallsData?.id)
   const { signTypedDataAsync } = useSignTypedData()
   const { mutateAsync: sendMessage } = useSendMessage(challengeId)
 
@@ -400,9 +401,10 @@ function ChatInput({
         const v = parseInt(signature.slice(130, 132), 16)
 
         setState('sending')
-        const txHash = await sendWithPermitAsync({ deadline, v, r, s })
+        const permitResult = await sendWithPermitAsync({ deadline, v, r, s })
         setState('waiting')
-        await sendMessage({ content: text.trim(), txHash: txHash as string })
+        const realTxHash = await waitForBatchCall(permitResult.id)
+        await sendMessage({ content: text.trim(), txHash: realTxHash })
       } else if (supportsBatch) {
         setState('sending')
         const batchResult = await sendWithApproval({
